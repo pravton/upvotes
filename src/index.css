@@ -15,3 +15,13 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+
+.default-arrow {
+  background-color: #F4F6F8;
+  color: #343A40;
+}
+
+.selected-arrow {
+  background-color: #E5E8FD;
+  color: #253CF2;
+}
