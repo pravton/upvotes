@@ -14,6 +14,8 @@ export const UpvoteProvider: React.FC<{ children: React.ReactNode } > = ({ child
   // Initial state is an empty array || the value from localStorage
   const [upvotes, setUpvotes] = useState<boolean[][]>(JSON.parse(localStorage.getItem('upvotes') || '[]'));
 
+  
+
   // Save to localStorage
   useEffect(() => {
     localStorage.setItem('upvotes', JSON.stringify(upvotes));
@@ -39,11 +41,20 @@ export const UpvoteProvider: React.FC<{ children: React.ReactNode } > = ({ child
     setUpvotes(updated);
   };
 
-  // Toggle an upvote
-  const toggleUpvote = (listIndex: number, upvoteIndex: number) => {
+  // Toggle a single upvote
+  // const toggleUpvote = (listIndex: number, upvoteIndex: number) => {
+  //   const newUpvotes = [...upvotes];
+  //   newUpvotes[listIndex][upvoteIndex] = !newUpvotes[listIndex][upvoteIndex];
+  //   setUpvotes(newUpvotes);
+  // };
+
+  // Toggle all upvotes at once
+  const toggleUpvote = (listIndex: number) => {
     const newUpvotes = [...upvotes];
-    newUpvotes[listIndex][upvoteIndex] = !newUpvotes[listIndex][upvoteIndex];
-    setUpvotes(newUpvotes);
+    const currentState = newUpvotes[listIndex][0];
+    const newState = !currentState;
+    newUpvotes[listIndex] = newUpvotes[listIndex].map(() => newState);
+    setUpvotes(newUpvotes); 
   };
 
   return (
