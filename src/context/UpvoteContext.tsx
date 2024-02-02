@@ -1,76 +1,63 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
 
+interface upvotesList {
+  id: number;
+  state: boolean;
+  upvotesCount: number;
+}
+
 interface UpvoteContextProps {
-  upvotes: boolean[][];
-  addUpvote: (listIndex: number) => void;
-  removeUpvote: (listIndex: number) => void;
-  toggleUpvote: (listIndex: number, upvoteIndex: number) => void;
+  upvotes: upvotesList[];
+  manipulateUpvotes: (id: number, operation: 'add' | 'remove') => void;
+  toggleUpvote: (id: number) => void;
 }
 
 const UpvoteContext = createContext<UpvoteContextProps | null>(null);
 
-export const UpvoteProvider: React.FC<{ children: React.ReactNode } > = ({ children }) => {
-  
+export const UpvoteProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   // Initial state is an empty array || the value from localStorage
-  const [upvotes, setUpvotes] = useState<boolean[][]>(JSON.parse(localStorage.getItem('upvotes') || '[]'));
+  const initialState = JSON.parse(localStorage.getItem('upvotesList') || '[]');
+  const [upvotes, setUpvotes] = useState(initialState);
 
-  
-
-  // Save to localStorage
+  // Save upvotes to localStorage
   useEffect(() => {
-    localStorage.setItem('upvotes', JSON.stringify(upvotes));
+    localStorage.setItem('upvotesList', JSON.stringify(upvotes));
   }, [upvotes]);
+  
 
-  // Add a new upvote
-  const addUpvote = (listIndex: number) => {
-    const newUpvotes = [...upvotes];
-    if (!newUpvotes[listIndex]) {
-      newUpvotes[listIndex] = [];
+  // Manipulate upvotes
+  const manipulateUpvotes = (id: number, operation: 'add' | 'remove') => {
+    const newUpvotes = upvotes.map((upvote: upvotesList) => {
+      if (upvote.id === id) {
+        return { ...upvote, upvotesCount: operation === 'add' ? upvote.upvotesCount + 1 : upvote.upvotesCount - 1 };
+      }
+      return upvote;
+    });
+    
+    // In case of 'add' operation, if the upvote is not found, add a new upvote
+    if (operation === 'add' && !newUpvotes.find((upvote: upvotesList) => upvote.id === id)) {
+      setUpvotes([...newUpvotes, { id: id, state: false, upvotesCount: 1 }]);
+      return;
     }
-  
-    let newState = false; 
-    if (newUpvotes[listIndex].length > 0) { 
-      newState = newUpvotes[listIndex].every(upvoteState => upvoteState);
-    }
-  
-    newUpvotes[listIndex].push(newState);
+
     setUpvotes(newUpvotes);
   };
 
-  // Remove an upvote
-  const removeUpvote = (listIndex: number) => {
-    const updated = [...upvotes];
-    if (!updated[listIndex]) {
-      updated[listIndex] = [];
-    }
-    updated[listIndex].pop();
-    setUpvotes(updated);
-  };
-
-  // Toggle a single upvote
-  // const toggleUpvote = (listIndex: number, upvoteIndex: number) => {
-  //   const newUpvotes = [...upvotes];
-  //   newUpvotes[listIndex][upvoteIndex] = !newUpvotes[listIndex][upvoteIndex];
-  //   setUpvotes(newUpvotes);
-  // };
-
-  // Toggle all upvotes at once
-  const toggleUpvote = (listIndex: number) => {
-    const newUpvotes = [...upvotes];
-    const currentState = newUpvotes[listIndex][0];
-    const newState = !currentState;
-    newUpvotes[listIndex] = newUpvotes[listIndex].map(() => newState);
-    setUpvotes(newUpvotes); 
+  // Toggle upvote
+  const toggleUpvote = (id: number) => {
+    const newUpvotes = upvotes.map((upvote:upvotesList) => 
+      upvote.id === id ? { ...upvote, state: !upvote.state } : upvote
+    );
+    setUpvotes(newUpvotes);
   };
 
   return (
-    <UpvoteContext.Provider value={{ upvotes, toggleUpvote, addUpvote, removeUpvote }}>
+    <UpvoteContext.Provider value={{ upvotes, manipulateUpvotes, toggleUpvote }}>
       {children}
     </UpvoteContext.Provider>
   );
 };
-
-
+  
 // Custom hook to use the UpvoteContext
 export const useUpvote = () => {
   const context = useContext(UpvoteContext);

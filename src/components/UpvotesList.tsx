@@ -1,40 +1,40 @@
 import React from "react";
 import Upvote from "./Upvote";
 import { useUpvote } from "../context/UpvoteContext";
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faPlus, faMinus } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faPlus, faMinus } from "@fortawesome/free-solid-svg-icons";
 
 interface UpvotesListProps {
   listIndex: number;
 }
 
 const UpvotesList: React.FC<UpvotesListProps> = ({ listIndex }) => {
-
   // Get the related data and functions from the context
-  const { upvotes, toggleUpvote, addUpvote, removeUpvote } = useUpvote();
+  const { upvotes, toggleUpvote, manipulateUpvotes } = useUpvote();
 
   // Get the upvotes for the current list
   const upvotesList = upvotes[listIndex];
 
   // Add an upvote
   const handleAddUpvote = () => {
-    addUpvote(listIndex);
-  }
+    manipulateUpvotes(listIndex, "add");
+  };
 
   // Remove an upvote
   const handleRemoveVote = () => {
-    removeUpvote(listIndex);
-  }
+    manipulateUpvotes(listIndex, "remove");
+  };
 
   return (
     <div className="flex flex-wrap md:justify-between justify-center mx-auto w-full max-w-[650px] mx-auto gap-3">
       <div className="flex w-full max-w-[510px] min-h-[76px] p-3 gap-3 border rounded-xl flex-wrap">
         {upvotesList &&
-          upvotesList.map((isSelected, index) => (
+          upvotesList.upvotesCount &&
+          Array.from({ length: upvotesList.upvotesCount }).map((_, index) => (
             <Upvote
-              key={index}
-              onClick={() => toggleUpvote(listIndex, index)}
-              isSelected={isSelected}
+              key={`${upvotesList.id}-${index}`}
+              onClick={() => toggleUpvote(listIndex)}
+              isSelected={upvotesList.state}
             />
           ))}
       </div>
@@ -60,6 +60,6 @@ const UpvotesList: React.FC<UpvotesListProps> = ({ listIndex }) => {
       </div>
     </div>
   );
-}
+};
 
 export default UpvotesList;
