@@ -27,7 +27,13 @@ export const UpvoteProvider: React.FC<{ children: React.ReactNode } > = ({ child
     if (!newUpvotes[listIndex]) {
       newUpvotes[listIndex] = [];
     }
-    newUpvotes[listIndex].push(false);
+  
+    let newState = false; 
+    if (newUpvotes[listIndex].length > 0) { 
+      newState = newUpvotes[listIndex].every(upvoteState => upvoteState);
+    }
+  
+    newUpvotes[listIndex].push(newState);
     setUpvotes(newUpvotes);
   };
 
