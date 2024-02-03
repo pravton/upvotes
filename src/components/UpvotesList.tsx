@@ -29,7 +29,7 @@ const UpvotesList: React.FC<UpvotesListProps> = ({ listIndex }) => {
     <div className="flex flex-wrap md:justify-between justify-center mx-auto w-full max-w-[650px] mx-auto gap-3">
       <div className="flex w-full max-w-[510px] min-h-[76px] p-3 gap-3 border rounded-xl flex-wrap">
         {upvotesList &&
-          upvotesList.upvotesCount &&
+          upvotesList.upvotesCount > 0 &&
           Array.from({ length: upvotesList.upvotesCount }).map((_, index) => (
             <Upvote
               key={`${upvotesList.id}-${index}`}

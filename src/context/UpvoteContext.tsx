@@ -29,7 +29,13 @@ export const UpvoteProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   const manipulateUpvotes = (id: number, operation: 'add' | 'remove') => {
     const newUpvotes = upvotes.map((upvote: upvotesList) => {
       if (upvote.id === id) {
-        return { ...upvote, upvotesCount: operation === 'add' ? upvote.upvotesCount + 1 : upvote.upvotesCount - 1 };
+        return {
+          ...upvote,
+          upvotesCount: operation === 'add' 
+              ? upvote.upvotesCount + 1 
+              : Math.max(0, upvote.upvotesCount - 1)
+      };
+      
       }
       return upvote;
     });
